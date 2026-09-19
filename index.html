@@ -163,6 +163,30 @@ body {
   window.addEventListener('orientationchange', hhResizeBurst);
 })();
 </script>
+<script>
+(function () {
+  var ctxs = [];
+  var Orig = window.AudioContext || window.webkitAudioContext;
+  if (Orig) {
+    var Wrapped = function () {
+      var ctx = new (Function.prototype.bind.apply(Orig, [null].concat(Array.prototype.slice.call(arguments))))();
+      ctxs.push(ctx);
+      return ctx;
+    };
+    Wrapped.prototype = Orig.prototype;
+    window.AudioContext = Wrapped;
+    if (window.webkitAudioContext) { window.webkitAudioContext = Wrapped; }
+  }
+  function hhResumeAudio() {
+    ctxs.forEach(function (ctx) {
+      if (ctx.state === 'suspended') { ctx.resume().catch(function () {}); }
+    });
+  }
+  ['pointerdown', 'touchend', 'keydown'].forEach(function (evt) {
+    document.addEventListener(evt, hhResumeAudio, { passive: true });
+  });
+})();
+</script>
 
 	</head>
 	<body>
@@ -182,7 +206,7 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":20719068,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":20794336,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
