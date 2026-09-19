@@ -94,6 +94,17 @@ body {
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 <link rel="manifest" href="index.manifest.json">
 <style>
+  html, body {
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    overscroll-behavior: none;
+  }
+  html, body, #canvas {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
   #hh-rotate-hint {
     display: none;
     position: fixed; inset: 0; z-index: 9999;
@@ -123,6 +134,33 @@ body {
   document.addEventListener('click', hhTryLock, { once: true });
   document.addEventListener('touchend', hhTryLock, { once: true });
   window.addEventListener('load', hhTryLock);
+
+  // viewport-fit=coverを既存のviewportタグへ追記（ノッチ/ホームインジケータ考慮）
+  var vp = document.querySelector('meta[name="viewport"]');
+  if (vp && vp.getAttribute('content').indexOf('viewport-fit') === -1) {
+    vp.setAttribute('content', vp.getAttribute('content') + ', viewport-fit=cover');
+  }
+
+  // PWA/タブをバックグラウンドから復帰した時、ブラウザがresizeイベントを
+  // 発火しないことがあり、Godotのcanvasサイズが古いままになり画面が
+  // 少し見切れて見える不具合の対策。復帰系のイベントで強制的に
+  // resizeを再発火させ、アニメーション/アドレスバーの収縮が落ち着く
+  // までの間、数回リトライする。
+  function hhForceResize() {
+    try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+  }
+  function hhResizeBurst() {
+    hhForceResize();
+    [50, 150, 300, 600, 1000].forEach(function (ms) {
+      setTimeout(hhForceResize, ms);
+    });
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') { hhResizeBurst(); }
+  });
+  window.addEventListener('pageshow', hhResizeBurst);
+  window.addEventListener('focus', hhResizeBurst);
+  window.addEventListener('orientationchange', hhResizeBurst);
 })();
 </script>
 
