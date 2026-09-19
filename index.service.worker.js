@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1789781299|54532706';
+const CACHE_VERSION = '1789789709|44767145';
 /** @type {string} */
 const CACHE_PREFIX = 'HEARTH & HORDE-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
